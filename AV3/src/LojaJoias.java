@@ -12,7 +12,6 @@ public class LojaJoias implements BaterPonto, ProdutoService {
 
     public void acoesDonoDaLoja(){
         Scanner res = new Scanner(System.in);
-        flavio.criarFuncionario();
         for (int i = 0; i < 10000; i++) {
             System.out.println("\nDigite a ação que deseja realizar:" +
                     "\n[1]-Cadastrar funcionário " +
@@ -31,7 +30,6 @@ public class LojaJoias implements BaterPonto, ProdutoService {
                 flavio.aplicarBonusVendedor();
             } else if(resposta.equalsIgnoreCase("4")){
                 flavio.mostrarFuncionarios();
-                flavio.mostraListaVendedores();
             }else if(resposta.equalsIgnoreCase("5")) {
                 System.out.println("-------------Voltando...-------------\n");
                 break;
@@ -42,14 +40,13 @@ public class LojaJoias implements BaterPonto, ProdutoService {
     }
     public void acoesFuncionario(){
         Scanner res = new Scanner(System.in);
-        criarProduto();
         for (int i = 0; i < 10000; i++) {
             System.out.println("\nQual ação você deseja fazer?" +
                     "\n[1]-bater o ponto de entrada." +
                     "\n[2]-bater ponto de saída." +
                     "\n[3]-Ações sobre o pronduto." +
                     "\n[4]-Ações sobre o cliente" +
-                    "\n[5]-Sair do sistema");
+                    "\n[5]-Voltar");
             String respostaAcao = res.nextLine();
             if(respostaAcao.equalsIgnoreCase("1")){
                 System.out.println("Digite seu cpf: ");
@@ -64,7 +61,7 @@ public class LojaJoias implements BaterPonto, ProdutoService {
             }else if(respostaAcao.equalsIgnoreCase("4")){
                 acoesSobreCliente();
             }else if(respostaAcao.equalsIgnoreCase("5")){
-                System.out.println("\n-------------Sistema finalizado-------------\n");
+                System.out.println("\n-------------Voltando...-------------\n");
                 break;
             }
         }
@@ -353,44 +350,52 @@ public class LojaJoias implements BaterPonto, ProdutoService {
 
     }
 
-    public void venderProduto(int codigo){
-        if (buscarProduto(codigo)) {
-            for (Produto aux:produtos){
-                Scanner res = new Scanner(System.in);
-                System.out.println("Quantidade do produto que será vendida: ");
-                int qtd = res.nextInt();
-                res.nextLine();
-                if(qtd < aux.qtdDoProduto){
+
+    public Produto buscarProdutoPorCodigo(int codigo) {
+        for (Produto produto : produtos) {
+            if (produto.codigo == codigo) {
+                return produto; // Retorna o produto encontrado
+            }
+        }
+        return null; // Retorna null se não encontrar
+    }
+
+    public void venderProduto(int codigo) {
+        Produto produto = buscarProdutoPorCodigo(codigo); // Busca o produto pelo código
+        if (produto != null) { // Se o produto existe
+            Scanner res = new Scanner(System.in);
+            System.out.println("Quantidade do produto que será vendida: ");
+            int qtd = res.nextInt();
+            res.nextLine();
+
+            if (qtd < produto.qtdDoProduto) {
+                System.out.println("Produto pronto para venda. Finalize com pagamento");
+                confirmarVenda();
+                int novaQtd = produto.qtdDoProduto - qtd;
+                produto.qtdDoProduto = novaQtd;
+                System.out.println("Nova quantidade em estoque do produto " + produto.nome + ": " + novaQtd);
+
+            } else if (qtd == produto.qtdDoProduto) {
+                System.out.println("AVISO: A quantidade da venda é igual ao estoque. Deseja continuar?\n[1]-Sim \n[2]-Não");
+                String resposta = res.nextLine();
+
+                if (resposta.equals("1")) {
                     System.out.println("Produto pronto para venda. Finalize com pagamento");
                     confirmarVenda();
-                    int novaQtd = aux.qtdDoProduto - qtd;
-                    aux.qtdDoProduto = novaQtd;
-                    System.out.println("Nova quantidade em estoque do produto " + aux.nome + ": " + novaQtd);
-                    break;
-                } else if(qtd == aux.qtdDoProduto){
-                    System.out.println("AVISO: A quantidade da venda é igual a do estoque. Deseja continuar?\n[1]-Sim \n[2]-Não");
-                    String resposta = res.nextLine();
-                    if(resposta.equalsIgnoreCase("1")){
-                        System.out.println("Produto pronto para venda. Finalize com pagamento");
-                        confirmarVenda();
-                        int novaQtd = aux.qtdDoProduto - qtd;
-                        aux.qtdDoProduto = novaQtd;
-                        System.out.println("Nova quantidade em estoque do produto " + aux.nome + ": " + novaQtd);
-                        break;
-                    }else{
-                        System.out.println("Venda cancelada");
-                    }
-                }else if(qtd > aux.qtdDoProduto){
-                    System.out.println("A quantidade do pedido ultrapassa a quantidade do estoque. " +
-                            "\nA quantidade do estoque é: " + aux.qtdDoProduto);
+                    produto.qtdDoProduto = 0; // Zera o estoque
+                    System.out.println("Produto " + produto.nome + " esgotado.");
+                } else {
+                    System.out.println("Venda cancelada.");
                 }
+
+            } else {
+                System.out.println("A quantidade do pedido ultrapassa o estoque. Estoque atual: " + produto.qtdDoProduto);
             }
-        } else{
+
+        } else {
             System.out.println("Produto com o código " + codigo + " não encontrado!");
         }
     }
-
-    //public void atualizarQtdDoProduto(Produto produto, int qtdVendida)
 
     public void criarProduto(){
         Produto p1 = new Produto();
@@ -415,6 +420,55 @@ public class LojaJoias implements BaterPonto, ProdutoService {
         p3.qtdDoProduto = 12;
         produtos.add(p3);
     }
+
+    public void iniciarSistema() {
+        System.out.println("Deseja iniciar o sistema? \n[1]-Sim \n[2]-Não");
+        Scanner res = new Scanner(System.in);
+        int r = res.nextInt();
+        res.nextLine(); // Consumir a nova linha após o nextInt()
+
+        if (r == 1) {
+            System.out.println("\n-------------------------Iniciando o sistema------------------------\n" +
+                    "\n--------------------------------------------------------------------" +
+                    "\n--------------------------------------------------------------------" +
+                    "\n--------------------------------------------------------------------" +
+                    "\n--------------------------------------------------------------------" +
+                    "\n--------------------------------------------------------------------" +
+                    "\n--------------------------------------------------------------------\n");
+            flavio.criarFuncionario();
+            criarProduto();
+            iniciarOperacoes();
+
+        } else {
+            System.out.println("\n-------------------Inicialização do sistema cancelada-------------------\n");
+        }
+    }
+
+    private void iniciarOperacoes() {
+        Scanner res = new Scanner(System.in);
+
+        // Loop principal das operações
+        for (int i = 0; i < 10000; i++) {
+            System.out.println("Qual o seu cargo? \n[1]-Dono \n[2]-Funcionário \n[3]-Vendedor");
+            int resposta = res.nextInt();
+            res.nextLine();
+
+            switch (resposta) {
+                case 1:
+                    acoesDonoDaLoja();
+                    break;
+                case 2:
+                    acoesFuncionario();
+                    break;
+                case 3:
+                    acoesVendedor();
+                    break;
+                default:
+                    System.out.println("Resposta inválida");
+            }
+        }
+    }
+
 }
 
 
