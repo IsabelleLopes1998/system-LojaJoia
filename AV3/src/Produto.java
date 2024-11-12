@@ -10,7 +10,10 @@ public class Produto {
         return nome;
     }
 
-    public void setNome(String nome) {
+    public void setNome(String nome) throws ValorInvalidoException {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new ValorInvalidoException("O nome do produto não pode ser nulo ou vazio.");
+        }
         this.nome = nome;
     }
 
@@ -18,7 +21,10 @@ public class Produto {
         return codigo;
     }
 
-    public void setCodigo(int codigo) {
+    public void setCodigo(int codigo) throws ValorInvalidoException {
+        if (codigo <= 0) {
+            throw new ValorInvalidoException("O código do produto deve ser um número positivo.");
+        }
         this.codigo = codigo;
     }
 
@@ -26,7 +32,10 @@ public class Produto {
         return qtdDoProduto;
     }
 
-    public void setQtdDoProduto(int qtdDoProduto) {
+    public void setQtdDoProduto(int qtdDoProduto) throws ValorInvalidoException {
+        if (qtdDoProduto < 0) {
+            throw new ValorInvalidoException("A quantidade do produto não pode ser negativa.");
+        }
         this.qtdDoProduto = qtdDoProduto;
     }
 
@@ -34,7 +43,10 @@ public class Produto {
         return preco;
     }
 
-    public void setPreco(float preco) {
+    public void setPreco(float preco) throws ValorInvalidoException {
+        if (preco <= 0) {
+            throw new ValorInvalidoException("O preço do produto deve ser um valor positivo.");
+        }
         this.preco = preco;
     }
 
@@ -46,4 +58,3 @@ public class Produto {
                 ", \npreco: " + preco;
     }
 }
-

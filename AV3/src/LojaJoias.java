@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -123,7 +124,67 @@ public class LojaJoias implements BaterPonto, ProdutoService {
         }
     }
 
-    public void cadastrarProduto(){
+    public void cadastrarProduto() {
+        try (Scanner res = new Scanner(System.in)) { // `try-with-resources` para garantir o fechamento do Scanner
+            Produto p = new Produto();
+
+            System.out.println("Digite o código do produto: ");
+            while (true) {
+                try {
+                    p.codigo = res.nextInt();
+                    res.nextLine();
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Por favor, insira um número válido para o código do produto.");
+                    res.nextLine();
+                }
+            }
+
+            System.out.println("Qual o tipo do produto: ");
+            p.tipo = res.nextLine();
+
+            System.out.println("Qual o nome do produto: ");
+            p.nome = res.nextLine();
+
+            System.out.println("Qual o preço do produto: ");
+            while (true) {
+                try {
+                    p.preco = res.nextFloat();
+                    if (p.preco <= 0) {
+                        System.out.println("O preço deve ser um valor positivo. Por favor, insira novamente:");
+                        continue;
+                    }
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Por favor, insira um número válido para o preço do produto.");
+                    res.nextLine();
+                }
+            }
+
+            System.out.println("Digite a quantidade do produto: ");
+            while (true) {
+                try {
+                    p.qtdDoProduto = res.nextInt();
+                    if (p.qtdDoProduto < 0) {
+                        System.out.println("A quantidade deve ser um valor não negativo. Por favor, insira novamente:");
+                        continue;
+                    }
+                    break; // Sai do loop se a entrada for válida
+                } catch (InputMismatchException e) {
+                    System.out.println("Por favor, insira um número válido para a quantidade do produto.");
+                    res.nextLine(); // Limpa a entrada inválida
+                }
+            }
+
+            produtos.add(p);
+            System.out.println("Produto cadastrado com sucesso!");
+
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro inesperado durante o cadastro do produto: " + e.getMessage());
+        }
+    }
+
+    /*public void cadastrarProduto(){
         Scanner res = new Scanner(System.in);
         Produto p = new Produto();
         System.out.println("Digite o cógido do produto: ");
@@ -138,7 +199,7 @@ public class LojaJoias implements BaterPonto, ProdutoService {
         System.out.println("Digite a quantidade do produto: ");
         p.qtdDoProduto = res.nextInt();
         produtos.add(p);
-    }
+    }*/
 
 
     public void excluirProduto(int codigo) {
@@ -198,8 +259,47 @@ public class LojaJoias implements BaterPonto, ProdutoService {
             }
         }
     }
-
     public void cadastrarCliente() {
+        try (Scanner res = new Scanner(System.in)) { // `try-with-resources` para garantir o fechamento do Scanner
+            Cliente novoCliente = new Cliente();
+
+            System.out.println("Qual o nome do novo cliente?");
+            novoCliente.nome = res.nextLine();
+
+            System.out.println("Qual o sexo do novo cliente?");
+            novoCliente.sexo = res.nextLine();
+
+            System.out.println("Qual a idade do novo cliente?");
+            while (true) {
+                try {
+                    novoCliente.idade = res.nextInt();
+                    res.nextLine();
+                    if (novoCliente.idade <= 0) {
+                        System.out.println("A idade deve ser um valor positivo. Por favor, insira novamente:");
+                    } else {
+                        break;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Por favor, insira um número válido para a idade.");
+                    res.nextLine();
+                }
+            }
+
+            System.out.println("Qual o CPF do novo cliente?");
+            novoCliente.cpf = res.nextLine();
+
+            System.out.println("Qual a data de nascimento do novo cliente?");
+            novoCliente.dataNascimento = res.nextLine();
+
+            clientes.add(novoCliente);
+            System.out.println("\n------------ Cliente cadastrado com sucesso! ------------\n");
+
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro inesperado durante o cadastro do cliente: " + e.getMessage());
+        }
+    }
+
+    /*public void cadastrarCliente() {
         Scanner res = new Scanner(System.in);
         Cliente novoCliente = new Cliente();
         System.out.println("Qual o nome do novo cliente?");
@@ -215,7 +315,7 @@ public class LojaJoias implements BaterPonto, ProdutoService {
         novoCliente.dataNascimento = res.nextLine();
         clientes.add(novoCliente);
         System.out.println("\n------------Cliente cadastrado com Sucesso!---------------\n");
-    }
+    }*/
 
 
     public Cliente buscarClientePorCpf() {
@@ -354,10 +454,10 @@ public class LojaJoias implements BaterPonto, ProdutoService {
     public Produto buscarProdutoPorCodigo(int codigo) {
         for (Produto produto : produtos) {
             if (produto.codigo == codigo) {
-                return produto; // Retorna o produto encontrado
+                return produto;
             }
         }
-        return null; // Retorna null se não encontrar
+        return null;
     }
 
     public void venderProduto(int codigo) {
@@ -397,28 +497,37 @@ public class LojaJoias implements BaterPonto, ProdutoService {
         }
     }
 
-    public void criarProduto(){
-        Produto p1 = new Produto();
-        p1.codigo = 1;
-        p1.tipo = "Colar";
-        p1.nome = "Colar de rosas";
-        p1.preco = 15;
-        p1.qtdDoProduto = 12;
-        produtos.add(p1);
-        Produto p2 = new Produto();
-        p2.codigo = 2;
-        p2.tipo = "Anel";
-        p2.nome = "Anel de rosas";
-        p2.preco = 15;
-        p2.qtdDoProduto = 12;
-        produtos.add(p2);
-        Produto p3 = new Produto();
-        p3.codigo = 3;
-        p3.tipo = "Pulseira";
-        p3.nome = "Pulseira de rosas";
-        p3.preco = 15;
-        p3.qtdDoProduto = 12;
-        produtos.add(p3);
+    public void criarProduto() {
+        try {
+            Produto p1 = new Produto();
+            p1.setCodigo(1);
+            p1.tipo = "Colar";
+            p1.setNome("Colar de rosas");
+            p1.setPreco(15);
+            p1.setQtdDoProduto(12);
+            produtos.add(p1);
+
+            Produto p2 = new Produto();
+            p2.setCodigo(2);
+            p2.tipo = "Anel";
+            p2.setNome("Anel de rosas");
+            p2.setPreco(15);
+            p2.setQtdDoProduto(12);
+            produtos.add(p2);
+
+            Produto p3 = new Produto();
+            p3.setCodigo(3);
+            p3.tipo = "Pulseira";
+            p3.setNome("Pulseira de rosas");
+            p3.setPreco(15);
+            p3.setQtdDoProduto(12);
+            produtos.add(p3);
+
+            System.out.println("Produtos criados e adicionados com sucesso!");
+
+        } catch (ValorInvalidoException e) {
+            System.out.println("Erro ao criar o produto: " + e.getMessage());
+        }
     }
 
     public void iniciarSistema() {
